@@ -28,13 +28,13 @@ public class ShiroRealm extends Pac4jRealm {
   private static final Collection<String> ROLES = new HashSet<>();
   private static final Collection<String> PERMISSIONS = new HashSet<>();
 
-  @Getter
-  @Setter
-  private String principalNameAttribute;
-
   static {
     ROLES.add("admin");
     PERMISSIONS.add("system:user:add");
+  }
+
+  public String getPrincipalNameAttribute() {
+    return "name";
   }
 
   @Override
@@ -50,7 +50,7 @@ public class ShiroRealm extends Pac4jRealm {
     if (token instanceof Pac4jToken) {
       Pac4jToken pac4jToken = (Pac4jToken) token;
       List<UserProfile> profiles = pac4jToken.getProfiles();
-      Pac4jPrincipal principal = new Pac4jPrincipal(profiles, this.principalNameAttribute);
+      Pac4jPrincipal principal = new Pac4jPrincipal(profiles, this.getPrincipalNameAttribute());
       PrincipalCollection principalCollection = new SimplePrincipalCollection(principal, this.getName());
       return new SimpleAuthenticationInfo(principalCollection, profiles.hashCode());
     }
