@@ -59,6 +59,26 @@ public class LarkService extends OAuth20Service {
   }
 
 
+  @Override
+  protected OAuthRequest createRefreshTokenRequest(String refreshToken, String scope) {
+    if (refreshToken != null && !refreshToken.isEmpty()) {
+      final OAuthRequest request = new OAuthRequest(api.getAccessTokenVerb(), api.getRefreshTokenEndpoint());
+
+      final Map<String, String> map = new HashMap<>();
+      map.put(OAuthConstants.GRANT_TYPE, OAuthConstants.REFRESH_TOKEN);
+      map.put(OAuthConstants.REFRESH_TOKEN, refreshToken);
+      final String json = JsonUtil.toJson(map);
+
+      request.setPayload(json);
+      request.addHeader("Content-Type", "application/json; charset=utf-8");
+      request.addHeader("Authorization", "Bearer " + appAccessToken(LarkAccessToken.APP));
+      return request;
+    } else {
+      throw new IllegalArgumentException("The refreshToken cannot be null or empty");
+    }
+  }
+
+
   @SneakyThrows
   private String appAccessToken(LarkAccessToken tokenType) {
     Response response = execute(apiTokenRequest(tokenType));
@@ -92,5 +112,7 @@ public class LarkService extends OAuth20Service {
 
     return request;
   }
+
+
 
 }

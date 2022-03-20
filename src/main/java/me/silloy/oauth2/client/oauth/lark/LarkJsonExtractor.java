@@ -16,7 +16,6 @@ public class LarkJsonExtractor extends OAuth2AccessTokenJsonExtractor {
   }
 
   private static class InstanceHolder {
-
     private static final LarkJsonExtractor INSTANCE = new LarkJsonExtractor();
   }
 
@@ -35,12 +34,10 @@ public class LarkJsonExtractor extends OAuth2AccessTokenJsonExtractor {
     return createToken(body);
   }
 
-
   /**
    * {"code":0,"data":{"access_token":"u-BwIHe3ZGv0V36qQnjEbZeh","avatar_big":"https://s1-imfile.feishucdn.com/static-resource/v1/v2_a1f5fcfa-8c43-4c45-a739-0ffdb4fb051g~?image_size=640x640\u0026cut_type=\u0026quality=\u0026format=image\u0026sticker_format=.webp","avatar_middle":"https://s1-imfile.feishucdn.com/static-resource/v1/v2_a1f5fcfa-8c43-4c45-a739-0ffdb4fb051g~?image_size=240x240\u0026cut_type=\u0026quality=\u0026format=image\u0026sticker_format=.webp","avatar_thumb":"https://s3-imfile.feishucdn.com/static-resource/v1/v2_a1f5fcfa-8c43-4c45-a739-0ffdb4fb051g~?image_size=72x72\u0026cut_type=\u0026quality=\u0026format=image\u0026sticker_format=.webp","avatar_url":"https://s3-imfile.feishucdn.com/static-resource/v1/v2_a1f5fcfa-8c43-4c45-a739-0ffdb4fb051g~?image_size=72x72\u0026cut_type=\u0026quality=\u0026format=image\u0026sticker_format=.webp","en_name":"苏少华","expires_in":6900,"name":"苏少华","open_id":"ou_5bd4517a4a421bf9547a3f5b745426a0","refresh_expires_in":2591700,"refresh_token":"ur-N60F9NSfogqXcWRrxEWBfa","tenant_key":"2c2d68c6f2cf9758","token_type":"Bearer","union_id":"on_1f085d0c01b01adff71edf05da2620b6"},"msg":"success"}
    */
   private OAuth2AccessToken createToken(String rawResponse) throws IOException {
-
     final JsonNode response = OBJECT_MAPPER.readTree(rawResponse);
 
     final JsonNode dataNode = response.get("data");

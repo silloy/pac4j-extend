@@ -31,7 +31,6 @@ shiro-redis:
     host: 127.0.0.1:6379
     timeout: 2000
     password:
-    #  Scan count. Shiro-redis use Scan to get keys, so you can define the number of elements returned at every iteration.
     count: 100
   session-dao:
     expire: -2

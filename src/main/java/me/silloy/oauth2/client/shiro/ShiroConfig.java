@@ -70,17 +70,6 @@ public class ShiroConfig extends ShiroWebFilterConfiguration {
   }
 
   // For Distributed system
-
-
-  /**
-   * 开启Shiro注解模式，可以在Controller中的方法上添加注解
-   */
-  @Bean
-  public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(@Qualifier("securityManager") DefaultSecurityManager securityManager) {
-    AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
-    authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
-    return authorizationAttributeSourceAdvisor;
-  }
 //
 //  @Bean
 //  public RedisManager redisManager() {
@@ -92,30 +81,6 @@ public class ShiroConfig extends ShiroWebFilterConfiguration {
 //    }
 //    return redisManager;
 //  }
-//
-//
-//  @Bean
-//  public RedisSessionDAO redisSessionDAO() {
-//    RedisSessionDAO redisSessionDAO = new RedisSessionDAO();
-//    redisSessionDAO.setRedisManager(redisManager());
-//    redisSessionDAO.setKeyPrefix("shiro:session:");
-//    return redisSessionDAO;
-//  }
-//
-//  @Bean
-//  public RedisCacheManager redisCacheManager() {
-//    RedisCacheManager redisCacheManager = new RedisCacheManager();
-//    redisCacheManager.setRedisManager(redisManager());
-//    redisCacheManager.setPrincipalIdFieldName("account");
-//    redisCacheManager.setExpire(86400);
-//    return redisCacheManager;
-//  }
-
-  @Autowired
-  RedisSessionDAO redisSessionDAO;
-
-  @Autowired
-  RedisCacheManager redisCacheManager;
 
   //  other http://alexxiyang.github.io/shiro-redis/
 
@@ -151,20 +116,29 @@ public class ShiroConfig extends ShiroWebFilterConfiguration {
        Note: Remember to add colon at the end of prefix.
    */
   @Bean
-  public SessionManager sessionManager() {
+  public SessionManager sessionManager(RedisSessionDAO redisSessionDAO) {
     ShiroSessionManager sessionManager = new ShiroSessionManager();
     sessionManager.setSessionDAO(redisSessionDAO);
     return sessionManager;
   }
 
   @Bean
-  public SessionsSecurityManager securityManager(List<Realm> realms) {
+  public DefaultWebSecurityManager securityManager(RedisCacheManager redisCacheManager, SessionManager sessionManager, List<Realm> realms) {
     DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager(realms);
-    securityManager.setSessionManager(sessionManager());
+    securityManager.setSessionManager(sessionManager);
     securityManager.setCacheManager(redisCacheManager);
     return securityManager;
   }
 
+  /**
+   * 开启Shiro注解模式，可以在Controller中的方法上添加注解
+   */
+  @Bean
+  public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(DefaultSecurityManager securityManager) {
+    AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
+    authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
+    return authorizationAttributeSourceAdvisor;
+  }
 
 
 
