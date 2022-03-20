@@ -1,0 +1,44 @@
+shiro:
+  loginUrl: /login.html
+  successUrl: /welcome.html
+
+pac4j:
+  lark:
+    auth-server: http://open.feishu.cn
+    key: cli_a190a3c3e539500e
+    secret: aPCve8eSAHt114jskFxudfmruaRVK6kU
+    callback-url: http://127.0.0.1:8082/callback
+
+server:
+  port: 8082
+
+logging:
+  level:
+    root: debug
+
+spring:
+  application:
+    name: shiro-admin
+  redis:
+    host: localhost
+    port: 6379
+
+
+shiro-redis:
+  enabled: true
+  redis-manager:
+    deploy-mode: standalone
+    host: 127.0.0.1:6379
+    timeout: 2000
+    password:
+    #  Scan count. Shiro-redis use Scan to get keys, so you can define the number of elements returned at every iteration.
+    count: 100
+  session-dao:
+    expire: -2
+    key-prefix: "shiro:session:"
+    session-in-memory-timeout: 1000
+    session-in-memory-enabled: true
+  cache-manager:
+    principal-id-field-name: id
+    expire: 1800
+    key-prefix: "shiro:cache:"
