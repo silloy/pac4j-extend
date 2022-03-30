@@ -15,6 +15,7 @@ public class TestController {
     return "SUCCESS";
   }
 
+
   @GetMapping
   public Instant now() {
     // Pac4jPrincipal

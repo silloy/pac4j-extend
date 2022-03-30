@@ -1,5 +1,5 @@
 shiro:
-  loginUrl: /login.html
+  loginUrl: /lark
   successUrl: /welcome.html
 
 pac4j:

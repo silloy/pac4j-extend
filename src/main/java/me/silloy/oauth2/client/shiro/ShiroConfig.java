@@ -2,6 +2,8 @@ package me.silloy.oauth2.client.shiro;
 
 import java.util.List;
 import me.silloy.oauth2.client.oauth.lark.LarkClient;
+import me.silloy.oauth2.client.oauth.lark.LarkSavedRequestHandler;
+import me.silloy.oauth2.client.oauth.lark.LarkShiroFilter;
 import me.silloy.oauth2.client.properties.AuthConfig;
 import io.buji.pac4j.filter.CallbackFilter;
 import io.buji.pac4j.filter.SecurityFilter;
@@ -9,20 +11,18 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.config.web.autoconfigure.ShiroWebFilterConfiguration;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.crazycake.shiro.RedisCacheManager;
-import org.crazycake.shiro.RedisManager;
 import org.crazycake.shiro.RedisSessionDAO;
 import org.pac4j.core.config.Config;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.pac4j.core.engine.CallbackLogic;
+import org.pac4j.core.engine.DefaultCallbackLogic;
+import org.pac4j.core.engine.DefaultSecurityLogic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,14 +36,21 @@ public class ShiroConfig extends ShiroWebFilterConfiguration {
   protected ShiroFilterFactoryBean shiroFilterFactoryBean() {
     ShiroFilterFactoryBean shiroFilterFactoryBean = super.shiroFilterFactoryBean();
     CallbackFilter callbackFilter = new CallbackFilter();
-    Config config = new Config(larkClient());
-    callbackFilter.setConfig(config);
+    Config larkClientConfig = new Config(larkClient());
+
+    DefaultSecurityLogic securityLogic = DefaultSecurityLogic.INSTANCE;
+    securityLogic.setSavedRequestHandler(new LarkSavedRequestHandler());
+    larkClientConfig.setSecurityLogic(securityLogic);
+
+    callbackFilter.setConfig(larkClientConfig);
     SecurityFilter ssoFilter = new SecurityFilter();
-    ssoFilter.setConfig(config);
+    ssoFilter.setConfig(larkClientConfig);
+
+    shiroFilterFactoryBean.getFilters().put("authc", new LarkShiroFilter());
     shiroFilterFactoryBean.getFilters().put("sso", ssoFilter);
     shiroFilterFactoryBean.getFilters().put("callbackFilter", callbackFilter);
     Map<String, String> map = new LinkedHashMap<>();
-    map.put("/", "sso");
+    map.put("/lark", "sso");
     map.put("/callback", "callbackFilter");
     map.put("/login**", "anon");
     map.put("/sign**", "anon");
@@ -66,21 +73,10 @@ public class ShiroConfig extends ShiroWebFilterConfiguration {
     realm.setAuthenticationCacheName("authenticationCache");
     realm.setAuthorizationCachingEnabled(true);
     realm.setAuthorizationCacheName("authorizationCache");
-    return new ShiroRealm();
+    return realm;
   }
 
-  // For Distributed system
-//
-//  @Bean
-//  public RedisManager redisManager() {
-//    RedisManager redisManager = new RedisManager();
-//    redisManager.setHost(redisHost);
-//    redisManager.setPort(redisPort);
-//    if (redisPassword != null && !("").equals(redisPassword)) {
-//      redisManager.setPassword(redisPassword);
-//    }
-//    return redisManager;
-//  }
+
 
   //  other http://alexxiyang.github.io/shiro-redis/
 
